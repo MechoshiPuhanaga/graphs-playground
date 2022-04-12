@@ -1,0 +1,18 @@
+# dependencies:
+node_modules
+
+# ide:
+.idea
+.vscode
+
+# built code:
+dist
+
+# logs:
+yarn-error.log
+
+# tests:
+coverage
+cypress/integration/examples
+.nyc_output
+instrumented
