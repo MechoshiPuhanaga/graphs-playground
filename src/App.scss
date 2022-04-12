@@ -1,5 +1,11 @@
 .Container {
   display: flex;
   justify-content: center;
-  padding: var(--offset-medium);
+}
+
+.Canvas {
+  height: 50vh;
+  color: var(--color-background-focus);
+  font-size: var(--font-medium);
+  background-color: var(--color-label);
 }

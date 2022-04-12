@@ -1,0 +1,14 @@
+.Container {
+  position: absolute;
+  width: 5px;
+  background-color: var(--color-border);
+  transform: rotate(45deg) translateX(-2px);
+  transform-origin: top left;
+
+  &:hover {
+    z-index: 1;
+    background-color: var(--color-error);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+  }
+}
