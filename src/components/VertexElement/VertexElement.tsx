@@ -8,10 +8,11 @@ import { ContextMenu } from '@components/ContextMenu';
 
 interface VertexProps {
   className?: string;
+  isVisited?: boolean;
   vertex: Vertex;
 }
 
-const VertexElement: FC<VertexProps> = memo(({ className, vertex }) => {
+const VertexElement: FC<VertexProps> = memo(({ className, isVisited, vertex }) => {
   const { from, graph, height, setFrom, setResult, width } = useCanvas();
   const [showMenu, setShowMenu] = useState(false);
 
@@ -24,7 +25,10 @@ const VertexElement: FC<VertexProps> = memo(({ className, vertex }) => {
 
   return (
     <div
-      className={useClass([styles.Container, className], [className])}
+      className={useClass(
+        [styles.Container, className, isVisited && styles.Visited],
+        [className, isVisited]
+      )}
       onContextMenu={(event) => {
         event.preventDefault();
 

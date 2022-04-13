@@ -6,12 +6,13 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState
 } from 'react';
 
 import { VertexElement } from '@components';
-import { Graph, useClass, Vertex } from '@services';
+import { Graph, Replayer, useClass, Vertex } from '@services';
 
 import styles from './Canvas.scss';
 import { EdgeElement } from '@components/EdgeElement';
@@ -53,6 +54,17 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
   const [result, setResult] = useState<{ label: string; list: Vertex[] }>({ label: '', list: [] });
 
   const [context, setContext] = useState({ from, graph, height: 0, setFrom, setResult, width: 0 });
+
+  const [replayState, setReplayState] = useState<{
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    visitedEdges: any;
+    visitedVertexes: Record<string, Vertex>;
+  }>({
+    visitedEdges: {},
+    visitedVertexes: {}
+  });
+
+  const replayer = useMemo(() => new Replayer({ timeout: 1000 }), []);
 
   const onDoubleClickHandler = useCallback(
     (event: MouseEvent) => {
@@ -108,6 +120,33 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
     });
   }, []);
 
+  useEffect(() => {
+    replayer.reset();
+
+    setReplayState(() => ({ visitedEdges: {}, visitedVertexes: {} }));
+
+    result.list.forEach((vertex) => {
+      replayer.add(() => {
+        setReplayState((currentReplayState) => {
+          return {
+            ...currentReplayState,
+            visitedVertexes: {
+              ...currentReplayState.visitedVertexes,
+              [vertex.id]: vertex
+            }
+          };
+        });
+      });
+    });
+
+    if (result.list.length) {
+      replayer.ready();
+      replayer.play();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [result]);
+
   return (
     <CanvasContext.Provider value={context}>
       <section
@@ -116,7 +155,13 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
         ref={element}
       >
         {Object.entries(graph.adjacencyList).map(([vertexId, vertex]) => {
-          return <VertexElement key={vertexId} vertex={vertex} />;
+          return (
+            <VertexElement
+              isVisited={!!replayState.visitedVertexes[vertexId]}
+              key={vertexId}
+              vertex={vertex}
+            />
+          );
         })}
         {graph.edges.map((edge) => {
           return <EdgeElement edge={edge} key={`${edge.from}-${edge.to}`} />;
