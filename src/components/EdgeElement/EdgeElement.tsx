@@ -1,6 +1,6 @@
-import { FC, memo, useMemo } from 'react';
+import { FC, memo, MouseEvent, useCallback, useMemo } from 'react';
 
-import { useCanvas } from '@components/Canvas';
+import { useCanvas } from '@components';
 import { Edge, useClass } from '@services';
 
 import styles from './EdgeElement.scss';
@@ -49,15 +49,20 @@ const EdgeElement: FC<EdgeProps> = memo(({ className, edge }) => {
     };
   }, [edge, graph.adjacencyList, height, width]);
 
+  const onDoubleClickHandler = useCallback(
+    (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      graph.removeEdge(edge);
+    },
+    [edge, graph]
+  );
+
   return (
     <div
       className={useClass([styles.Container, className], [className])}
-      onDoubleClick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        graph.removeEdge(edge);
-      }}
+      onDoubleClick={onDoubleClickHandler}
       style={style}
     ></div>
   );

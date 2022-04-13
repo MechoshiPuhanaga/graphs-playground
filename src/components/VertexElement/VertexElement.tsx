@@ -1,9 +1,10 @@
-import { FC, memo, useMemo } from 'react';
+import { FC, memo, useMemo, useState } from 'react';
 
 import { useCanvas } from '@components/Canvas';
 import { useClass, Vertex } from '@services';
 
 import styles from './VertexElement.scss';
+import { ContextMenu } from '@components/ContextMenu';
 
 interface VertexProps {
   className?: string;
@@ -11,7 +12,8 @@ interface VertexProps {
 }
 
 const VertexElement: FC<VertexProps> = memo(({ className, vertex }) => {
-  const { from, graph, height, setFrom, width } = useCanvas();
+  const { from, graph, height, setFrom, setResult, width } = useCanvas();
+  const [showMenu, setShowMenu] = useState(false);
 
   const style = useMemo(() => {
     return {
@@ -23,6 +25,17 @@ const VertexElement: FC<VertexProps> = memo(({ className, vertex }) => {
   return (
     <div
       className={useClass([styles.Container, className], [className])}
+      onContextMenu={(event) => {
+        event.preventDefault();
+
+        setShowMenu(true);
+      }}
+      onDoubleClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        graph.removeVertex(vertex.id);
+      }}
       onMouseDown={(event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -38,6 +51,14 @@ const VertexElement: FC<VertexProps> = memo(({ className, vertex }) => {
       }}
       style={style}
     >
+      {showMenu ? (
+        <ContextMenu
+          close={() => setShowMenu(false)}
+          graph={graph}
+          setResult={setResult}
+          vertex={vertex}
+        />
+      ) : null}
       <span className={styles.Label}>{vertex.label}</span>
     </div>
   );

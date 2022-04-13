@@ -1,10 +1,12 @@
 .Container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  user-select: none;
 }
 
 .Canvas {
-  height: 50vh;
+  height: 75vh;
   color: var(--color-background-focus);
   font-size: var(--font-medium);
   background-color: var(--color-label);

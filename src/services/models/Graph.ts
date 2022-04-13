@@ -58,6 +58,21 @@ export class Graph {
     }
   }
 
+  removeVertex(id: string) {
+    const { neighbors } = this.adjacencyList[id];
+    delete this.adjacencyList[id];
+
+    this.edges = this.edges.filter((edge) => edge.from !== id && edge.to !== id);
+
+    neighbors.forEach((neighborId) => {
+      this.adjacencyList[neighborId].neighbors = this.adjacencyList[neighborId].neighbors.filter(
+        (vertexId) => vertexId !== id
+      );
+    });
+
+    this.version++;
+  }
+
   updateVertexCoordinates({ coordinates, id }: { coordinates: Coordinates; id: string }): boolean {
     if (this.adjacencyList[id]) {
       this.adjacencyList[id] = { ...this.adjacencyList[id], coordinates };
@@ -107,20 +122,75 @@ export class Graph {
     if (!this.adjacencyList[from] || !this.adjacencyList[to]) {
       throw new Error("Can't remove edge");
     } else {
-      this.edges = this.edges.filter((edge) => {
-        return !(edge.from === from && edge.to === to);
-      });
+      this.edges = this.edges.filter((edge) => !(edge.from === from && edge.to === to));
 
-      this.adjacencyList[from].neighbors = this.adjacencyList[from].neighbors.filter((vertexId) => {
-        vertexId !== to;
-      });
+      this.adjacencyList[from].neighbors = this.adjacencyList[from].neighbors.filter(
+        (vertexId) => vertexId !== to
+      );
 
-      this.adjacencyList[to].neighbors = this.adjacencyList[to].neighbors.filter((vertexId) => {
-        vertexId !== from;
-      });
+      this.adjacencyList[to].neighbors = this.adjacencyList[to].neighbors.filter(
+        (vertexId) => vertexId !== from
+      );
 
       this.version++;
     }
+  }
+
+  traverseDF(startId: string) {
+    const visited = Object.keys(this.adjacencyList).reduce((obj, id) => {
+      obj[id] = false;
+
+      return obj;
+    }, {} as Record<string, boolean>);
+
+    const result: Vertex[] = [];
+
+    const startVertex = this.adjacencyList[startId];
+
+    const df = (vertex: Vertex) => {
+      if (visited[vertex.id]) {
+        return;
+      }
+
+      visited[vertex.id] = true;
+
+      result.push(vertex);
+
+      vertex.neighbors.forEach((neighborId) => df(this.adjacencyList[neighborId]));
+    };
+
+    df(startVertex);
+
+    return result;
+  }
+
+  traverseBF(startId: string) {
+    const visited = Object.keys(this.adjacencyList).reduce((obj, id) => {
+      obj[id] = false;
+
+      return obj;
+    }, {} as Record<string, boolean>);
+
+    const result: Vertex[] = [];
+
+    const startVertex = this.adjacencyList[startId];
+
+    const queue = [startVertex];
+
+    while (queue.length) {
+      const vertex = queue.shift() as Vertex;
+
+      if (!visited[vertex.id]) {
+        result.push(vertex);
+        visited[vertex.id] = true;
+
+        if (vertex.neighbors.length) {
+          queue.push(...vertex.neighbors.map((vertexId) => this.adjacencyList[vertexId]));
+        }
+      }
+    }
+
+    return result;
   }
 
   toString() {

@@ -1,0 +1,42 @@
+.Container {
+  position: absolute;
+  z-index: 1;
+  min-width: 26rem;
+  padding: var(--offset-small);
+  color: var(--color-label);
+  background-color: var(--color-background-focus);
+  border-radius: var(--border-radius);
+}
+
+.Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.Title {
+  margin: var(--offset-small) 0;
+}
+
+.Close {
+  cursor: pointer;
+}
+
+.Button {
+  width: 100%;
+  padding: var(--offset-small);
+  background-color: var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
+  transition: ease-in-out var(--transition);
+  cursor: pointer;
+
+  &:not(:last-child) {
+    margin-bottom: var(--offset-small);
+  }
+
+  &:hover {
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.75);
+  }
+}

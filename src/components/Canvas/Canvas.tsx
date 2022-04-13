@@ -1,5 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { createContext, FC, useContext, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  FC,
+  MouseEvent,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 
 import { VertexElement } from '@components';
 import { Graph, useClass, Vertex } from '@services';
@@ -12,6 +21,7 @@ interface ICanvasContext {
   graph: Graph;
   height: number;
   setFrom: Function;
+  setResult: ({ label, list }: { label: string; list: Vertex[] }) => void;
   width: number;
 }
 
@@ -20,6 +30,7 @@ const initialCanvasContext: ICanvasContext = {
   graph: new Graph(() => {}),
   height: 0,
   setFrom: () => {},
+  setResult: () => {},
   width: 0
 };
 
@@ -39,7 +50,23 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
 
   const [from, setFrom] = useState<Vertex | null>(null);
 
-  const [context, setContext] = useState({ from, graph, height: 0, setFrom, width: 0 });
+  const [result, setResult] = useState<{ label: string; list: Vertex[] }>({ label: '', list: [] });
+
+  const [context, setContext] = useState({ from, graph, height: 0, setFrom, setResult, width: 0 });
+
+  const onDoubleClickHandler = useCallback(
+    (event: MouseEvent) => {
+      const { clientX, clientY, target } = event;
+
+      const element = target as HTMLElement;
+
+      graph.addVertex({
+        coordinates: { x: clientX / element.offsetWidth, y: clientY / element.offsetHeight },
+        id: `${new Date().getTime()}`
+      });
+    },
+    [graph]
+  );
 
   useEffect(() => {
     setContext((currentContext) => {
@@ -82,16 +109,7 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
     <CanvasContext.Provider value={context}>
       <section
         className={useClass([styles.Container, className], [className])}
-        onDoubleClick={(event) => {
-          const { clientX, clientY, target } = event;
-
-          const element = target as HTMLElement;
-
-          graph.addVertex({
-            coordinates: { x: clientX / element.offsetWidth, y: clientY / element.offsetHeight },
-            id: `${new Date().getTime()}`
-          });
-        }}
+        onDoubleClick={onDoubleClickHandler}
         ref={element}
       >
         {Object.entries(graph.adjacencyList).map(([vertexId, vertex]) => {
@@ -101,6 +119,10 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
           return <EdgeElement edge={edge} key={`${edge.from}-${edge.to}`} />;
         })}
       </section>
+      <div className={styles.Result}>
+        <h4>{result.label}</h4>
+        <div>{result.list.map((vertex) => vertex.label).join(' --> ')}</div>
+      </div>
     </CanvasContext.Provider>
   );
 };
