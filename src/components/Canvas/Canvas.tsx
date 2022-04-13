@@ -58,10 +58,13 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
     (event: MouseEvent) => {
       const { clientX, clientY, target } = event;
 
-      const element = target as HTMLElement;
+      const targetElement = target as HTMLElement;
 
       graph.addVertex({
-        coordinates: { x: clientX / element.offsetWidth, y: clientY / element.offsetHeight },
+        coordinates: {
+          x: clientX / targetElement.offsetWidth,
+          y: clientY / targetElement.offsetHeight
+        },
         id: `${new Date().getTime()}`
       });
     },

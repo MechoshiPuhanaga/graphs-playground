@@ -52,10 +52,11 @@ export class Graph {
         neighbors: []
       };
       this.version++;
+
       return true;
-    } else {
-      return false;
     }
+
+    return false;
   }
 
   removeVertex(id: string) {
@@ -77,10 +78,11 @@ export class Graph {
     if (this.adjacencyList[id]) {
       this.adjacencyList[id] = { ...this.adjacencyList[id], coordinates };
       this.version++;
+
       return true;
-    } else {
-      return false;
     }
+
+    return false;
   }
 
   addEdge(fromId: string, toId: string) {
