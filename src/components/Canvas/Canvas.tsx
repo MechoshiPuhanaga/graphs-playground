@@ -163,6 +163,18 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
         onDoubleClick={onDoubleClickHandler}
         ref={element}
       >
+        <button
+          className={styles.ClearButton}
+          onClick={() => {
+            graph.adjacencyList = {};
+            graph.edges = [];
+            replayer.reset();
+            setResult({ label: '', list: [] });
+            Graph.LABEL_ID = 65;
+          }}
+        >
+          Clear
+        </button>
         {Object.entries(graph.adjacencyList).map(([vertexId, vertex]) => {
           return (
             <VertexElement
