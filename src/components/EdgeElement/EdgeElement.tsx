@@ -8,9 +8,10 @@ import styles from './EdgeElement.scss';
 interface EdgeProps {
   className?: string;
   edge: Edge;
+  isVisited?: boolean;
 }
 
-const EdgeElement: FC<EdgeProps> = memo(({ className, edge }) => {
+const EdgeElement: FC<EdgeProps> = memo(({ className, edge, isVisited }) => {
   const { graph, height, width } = useCanvas();
 
   const style = useMemo(() => {
@@ -61,7 +62,10 @@ const EdgeElement: FC<EdgeProps> = memo(({ className, edge }) => {
 
   return (
     <div
-      className={useClass([styles.Container, className], [className])}
+      className={useClass(
+        [styles.Container, className, isVisited && styles.Visited],
+        [className, isVisited]
+      )}
       onDoubleClick={onDoubleClickHandler}
       style={style}
     ></div>

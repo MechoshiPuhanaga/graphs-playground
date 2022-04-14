@@ -19,6 +19,11 @@ export interface Edge {
 
 export type AdjacencyList = Record<string, Vertex>;
 
+export interface VisitedItem {
+  from: string;
+  vertex: Vertex;
+}
+
 export class Graph {
   static LABEL_ID = 65;
 
@@ -145,23 +150,25 @@ export class Graph {
       return obj;
     }, {} as Record<string, boolean>);
 
-    const result: Vertex[] = [];
+    const result: VisitedItem[] = [];
 
     const startVertex = this.adjacencyList[startId];
 
-    const df = (vertex: Vertex) => {
-      if (visited[vertex.id]) {
+    const df = (visitedItem: VisitedItem) => {
+      if (visited[visitedItem.vertex.id]) {
         return;
       }
 
-      visited[vertex.id] = true;
+      visited[visitedItem.vertex.id] = true;
 
-      result.push(vertex);
+      result.push(visitedItem);
 
-      vertex.neighbors.forEach((neighborId) => df(this.adjacencyList[neighborId]));
+      visitedItem.vertex.neighbors.forEach((neighborId) =>
+        df({ from: visitedItem.vertex.id, vertex: this.adjacencyList[neighborId] })
+      );
     };
 
-    df(startVertex);
+    df({ from: '', vertex: startVertex });
 
     return result;
   }
@@ -173,21 +180,26 @@ export class Graph {
       return obj;
     }, {} as Record<string, boolean>);
 
-    const result: Vertex[] = [];
+    const result: VisitedItem[] = [];
 
     const startVertex = this.adjacencyList[startId];
 
-    const queue = [startVertex];
+    const queue: VisitedItem[] = [{ from: '', vertex: startVertex }];
 
     while (queue.length) {
-      const vertex = queue.shift() as Vertex;
+      const visitedItem = queue.shift() as VisitedItem;
 
-      if (!visited[vertex.id]) {
-        result.push(vertex);
-        visited[vertex.id] = true;
+      if (!visited[visitedItem.vertex.id]) {
+        result.push(visitedItem);
+        visited[visitedItem.vertex.id] = true;
 
-        if (vertex.neighbors.length) {
-          queue.push(...vertex.neighbors.map((vertexId) => this.adjacencyList[vertexId]));
+        if (visitedItem.vertex.neighbors.length) {
+          queue.push(
+            ...visitedItem.vertex.neighbors.map((vertexId) => ({
+              from: visitedItem.vertex.id,
+              vertex: this.adjacencyList[vertexId]
+            }))
+          );
         }
       }
     }

@@ -1,14 +1,22 @@
 .Container {
   position: absolute;
   width: 5px;
-  background-color: var(--color-border);
+  background-color: var(--color-edge);
+  border-radius: var(--border-radius);
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
   transform: rotate(45deg) translateX(-2px);
   transform-origin: top left;
+  transition: all var(--transition) ease-in-out;
+
+  &.Visited {
+    background-color: var(--color-ok-light);
+    box-shadow: 0px 4px 3px 0px rgba(0, 0, 0, 0.75);
+  }
 
   &:hover {
     z-index: 1;
     background-color: var(--color-error);
-    border-radius: var(--border-radius);
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
     cursor: pointer;
   }
 }

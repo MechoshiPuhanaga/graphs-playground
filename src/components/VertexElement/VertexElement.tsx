@@ -26,29 +26,36 @@ const VertexElement: FC<VertexProps> = memo(({ className, isVisited, vertex }) =
   return (
     <div
       className={useClass(
-        [styles.Container, className, isVisited && styles.Visited],
-        [className, isVisited]
+        [styles.Container, className, isVisited && styles.Visited, showMenu && styles.WithMenu],
+        [className, isVisited, showMenu]
       )}
       onContextMenu={(event) => {
         event.preventDefault();
+        event.stopPropagation();
 
         setShowMenu(true);
       }}
       onDoubleClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
-
-        graph.removeVertex(vertex.id);
       }}
       onMouseDown={(event) => {
+        if (event.button !== 0) {
+          return;
+        }
+
         event.preventDefault();
         event.stopPropagation();
 
         if (from && from.id === vertex.id) {
           setFrom(null);
         } else if (from) {
-          graph.addEdge(from.id, vertex.id);
-          setFrom(null);
+          try {
+            graph.addEdge(from.id, vertex.id);
+          } catch (error) {
+          } finally {
+            setFrom(null);
+          }
         } else {
           setFrom(vertex);
         }
