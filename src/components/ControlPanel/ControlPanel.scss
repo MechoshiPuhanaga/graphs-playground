@@ -10,17 +10,13 @@
 
 .ResultList {
   display: flex;
+  justify-content: center;
   margin: var(--offset-medium) 0;
   padding: 0;
 
   .ResultItem {
+    margin-right: var(--offset-medium);
     font-weight: bold;
-
-    &:not(:first-child) {
-      &::before {
-        content: "---";
-      }
-    }
 
     &.Visited {
       color: var(--color-ok);
@@ -33,10 +29,9 @@
   align-items: center;
 }
 
-.Button,
-.ClearButton {
-  width: 12rem;
-  padding: var(--offset-small);
+.Button {
+  min-width: 10rem;
+  padding: var(--offset-tiny);
   background-color: #ff7f7f;
   border-radius: var(--border-radius);
   box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
@@ -52,14 +47,11 @@
   }
 }
 
-.ClearButton {
-  width: 8rem;
-}
-
 .Timeout {
   width: 10rem;
-  padding: var(--offset-small);
+  padding: var(--offset-tiny);
   font-size: var(--font-medium);
+  text-align: right;
   border: none;
   border-radius: var(--border-radius);
 }

@@ -184,7 +184,7 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
         {Object.entries(graph.adjacencyList).map(([vertexId, vertex]) => {
           return (
             <VertexElement
-              isFrom={from?.id === vertexId}
+              isFrom={from?.id === vertexId || result.list[0]?.vertex?.id === vertexId}
               isVisited={!!replayState.visitedVertexes[vertexId]}
               key={vertexId}
               vertex={vertex}

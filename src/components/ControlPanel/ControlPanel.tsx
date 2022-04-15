@@ -55,6 +55,16 @@ const ControlPanel: FC<ControlPanelProps> = memo(
           <button
             className={styles.Button}
             onClick={() => {
+              setResult({ ...result });
+              replayer.ready();
+              replayer.play();
+            }}
+          >
+            replay
+          </button>
+          <button
+            className={styles.Button}
+            onClick={() => {
               setResult({ label: '', list: [] });
               replayer.reset();
             }}
