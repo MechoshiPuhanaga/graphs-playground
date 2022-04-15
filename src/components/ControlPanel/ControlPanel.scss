@@ -32,7 +32,8 @@
 .Button {
   min-width: 10rem;
   padding: var(--offset-tiny);
-  background-color: #ff7f7f;
+  color: var(--color-background-focus);
+  background-color: #246797;
   border-radius: var(--border-radius);
   box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
   transition: ease-in-out var(--transition);
