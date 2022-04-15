@@ -67,4 +67,6 @@ const ContextMenu: FC<ContextMenuProps> = memo(({ className, close, graph, setRe
   );
 });
 
+ContextMenu.displayName = 'ContextMenu';
+
 export { ContextMenu };

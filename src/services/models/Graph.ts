@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { calculateEdgeWeight } from '@services';
+
 export interface Coordinates {
   x: number;
   y: number;
@@ -79,15 +81,25 @@ export class Graph {
     this.version++;
   }
 
-  updateVertexCoordinates({ coordinates, id }: { coordinates: Coordinates; id: string }): boolean {
+  updateVertexCoordinates({ coordinates, id }: { coordinates: Coordinates; id: string }) {
     if (this.adjacencyList[id]) {
       this.adjacencyList[id] = { ...this.adjacencyList[id], coordinates };
+
+      // Recalculate the weight of the edges
+      // connected to this vertex:
+      this.edges = this.edges.map((edge) => {
+        if (edge.from === id || edge.to === id) {
+          return {
+            ...edge,
+            weight: calculateEdgeWeight(this.adjacencyList[edge.from], this.adjacencyList[edge.to])
+          };
+        }
+
+        return edge;
+      });
+
       this.version++;
-
-      return true;
     }
-
-    return false;
   }
 
   addEdge(fromId: string, toId: string) {
@@ -95,6 +107,7 @@ export class Graph {
       throw new Error("Can't add edge");
     } else {
       let flag = 0;
+
       if (!this.adjacencyList[fromId].neighbors.includes(toId)) {
         this.adjacencyList[fromId].neighbors.push(toId);
         flag++;
@@ -106,18 +119,10 @@ export class Graph {
       }
 
       if (flag === 2) {
-        const from = this.adjacencyList[fromId];
-        const to = this.adjacencyList[toId];
-
-        const length = Math.sqrt(
-          (from.coordinates.x - to.coordinates.x) ** 2 +
-            (from.coordinates.y - to.coordinates.y) ** 2
-        );
-
         this.edges.push({
           from: fromId,
           to: toId,
-          weight: length
+          weight: calculateEdgeWeight(this.adjacencyList[fromId], this.adjacencyList[toId])
         });
 
         this.version++;

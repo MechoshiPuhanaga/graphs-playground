@@ -1,4 +1,4 @@
-import { FC, memo, useMemo, useState } from 'react';
+import { DragEvent, FC, memo, useCallback, useMemo, useState } from 'react';
 
 import { useCanvas } from '@components/Canvas';
 import { useClass, Vertex } from '@services';
@@ -23,12 +23,28 @@ const VertexElement: FC<VertexProps> = memo(({ className, isVisited, vertex }) =
     };
   }, [height, vertex.coordinates.x, vertex.coordinates.y, width]);
 
+  const onDragEndHandler = useCallback(
+    (event: DragEvent<HTMLDivElement>) => {
+      const { clientX, clientY } = event;
+
+      graph.updateVertexCoordinates({
+        coordinates: {
+          x: clientX / width,
+          y: clientY / height
+        },
+        id: vertex.id
+      });
+    },
+    [graph, height, vertex.id, width]
+  );
+
   return (
     <div
       className={useClass(
         [styles.Container, className, isVisited && styles.Visited, showMenu && styles.WithMenu],
         [className, isVisited, showMenu]
       )}
+      draggable
       onContextMenu={(event) => {
         event.preventDefault();
         event.stopPropagation();
@@ -39,12 +55,15 @@ const VertexElement: FC<VertexProps> = memo(({ className, isVisited, vertex }) =
         event.preventDefault();
         event.stopPropagation();
       }}
+      onDragEnd={onDragEndHandler}
+      onDragStart={() => {
+        setFrom(null);
+      }}
       onMouseDown={(event) => {
         if (event.button !== 0) {
           return;
         }
 
-        event.preventDefault();
         event.stopPropagation();
 
         if (from && from.id === vertex.id) {
@@ -74,5 +93,7 @@ const VertexElement: FC<VertexProps> = memo(({ className, isVisited, vertex }) =
     </div>
   );
 });
+
+VertexElement.displayName = 'VertexElement';
 
 export { VertexElement };

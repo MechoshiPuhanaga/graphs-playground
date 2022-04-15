@@ -72,4 +72,6 @@ const EdgeElement: FC<EdgeProps> = memo(({ className, edge, isVisited }) => {
   );
 });
 
+EdgeElement.displayName = 'EdgeElement';
+
 export { EdgeElement };
