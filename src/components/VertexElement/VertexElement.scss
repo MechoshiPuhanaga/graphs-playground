@@ -11,6 +11,7 @@
   cursor: pointer;
 
   &:hover,
+  &.IsFrom,
   &.Visited {
     width: var(--offset-large);
     height: var(--offset-large);
@@ -20,6 +21,14 @@
     .Label {
       width: var(--offset-large);
       height: var(--offset-large);
+    }
+  }
+
+  &.IsFrom {
+    background-color: #ff7f7f;
+
+    .Label {
+      color: #ff7f7f;
     }
   }
 

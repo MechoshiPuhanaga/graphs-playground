@@ -8,11 +8,12 @@ import { ContextMenu } from '@components/ContextMenu';
 
 interface VertexProps {
   className?: string;
+  isFrom?: boolean;
   isVisited?: boolean;
   vertex: Vertex;
 }
 
-const VertexElement: FC<VertexProps> = memo(({ className, isVisited, vertex }) => {
+const VertexElement: FC<VertexProps> = memo(({ className, isFrom, isVisited, vertex }) => {
   const { from, graph, height, setFrom, setResult, width } = useCanvas();
   const [showMenu, setShowMenu] = useState(false);
 
@@ -41,8 +42,14 @@ const VertexElement: FC<VertexProps> = memo(({ className, isVisited, vertex }) =
   return (
     <div
       className={useClass(
-        [styles.Container, className, isVisited && styles.Visited, showMenu && styles.WithMenu],
-        [className, isVisited, showMenu]
+        [
+          styles.Container,
+          className,
+          isVisited && styles.Visited,
+          showMenu && styles.WithMenu,
+          isFrom && styles.IsFrom
+        ],
+        [className, isFrom, isVisited, showMenu]
       )}
       draggable
       onContextMenu={(event) => {

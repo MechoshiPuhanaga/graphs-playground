@@ -11,18 +11,27 @@ import {
   useState
 } from 'react';
 
-import { VertexElement } from '@components';
-import { Graph, Replayer, useClass, Vertex, VisitedItem } from '@services';
+import { ControlPanel, EdgeElement, VertexElement } from '@components';
+import { Graph, Replayer, REPLAY_TIMEOUT, useClass, Vertex, VisitedItem } from '@services';
 
 import styles from './Canvas.scss';
-import { EdgeElement } from '@components/EdgeElement';
+
+export interface TraversalResult {
+  label: string;
+  list: VisitedItem[];
+}
+
+export interface ReplayState {
+  visitedEdges: Record<string, boolean>;
+  visitedVertexes: Record<string, Vertex>;
+}
 
 interface ICanvasContext {
   from: Vertex | null;
   graph: Graph;
   height: number;
   setFrom: Function;
-  setResult: ({ label, list }: { label: string; list: VisitedItem[] }) => void;
+  setResult: ({ label, list }: TraversalResult) => void;
   width: number;
 }
 
@@ -51,22 +60,19 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
 
   const [from, setFrom] = useState<Vertex | null>(null);
 
-  const [result, setResult] = useState<{ label: string; list: VisitedItem[] }>({
+  const [result, setResult] = useState<TraversalResult>({
     label: '',
     list: []
   });
 
   const [context, setContext] = useState({ from, graph, height: 0, setFrom, setResult, width: 0 });
 
-  const [replayState, setReplayState] = useState<{
-    visitedEdges: Record<string, boolean>;
-    visitedVertexes: Record<string, Vertex>;
-  }>({
+  const [replayState, setReplayState] = useState<ReplayState>({
     visitedEdges: {},
     visitedVertexes: {}
   });
 
-  const replayer = useMemo(() => new Replayer({ timeout: 1000 }), []);
+  const replayer = useMemo(() => new Replayer({ timeout: REPLAY_TIMEOUT }), []);
 
   const onDoubleClickHandler = useCallback(
     (event: MouseEvent) => {
@@ -173,11 +179,12 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
             Graph.LABEL_ID = 65;
           }}
         >
-          Clear
+          clear
         </button>
         {Object.entries(graph.adjacencyList).map(([vertexId, vertex]) => {
           return (
             <VertexElement
+              isFrom={from?.id === vertexId}
               isVisited={!!replayState.visitedVertexes[vertexId]}
               key={vertexId}
               vertex={vertex}
@@ -198,69 +205,18 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
             />
           );
         })}
+
+        <ControlPanel
+          className={useClass(
+            [styles.ControlPanel, !result.list.length && styles.Hidden],
+            [result.list.length]
+          )}
+          replayer={replayer}
+          replayState={replayState}
+          result={result}
+          setResult={setResult}
+        />
       </section>
-      <div className={styles.Result}>
-        {result.list.length ? (
-          <>
-            <h4>{result.label}</h4>
-            <ol className={styles.ResultList}>
-              {result.list.map((visitedItem) => {
-                return (
-                  <li
-                    className={[
-                      styles.ResultItem,
-                      replayState.visitedVertexes[visitedItem.vertex.id] && styles.Visited
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                    key={visitedItem.vertex.id}
-                  >
-                    {visitedItem.vertex.label}
-                  </li>
-                );
-              })}
-            </ol>
-            <div className={styles.Controls}>
-              <button
-                className={styles.Button}
-                onClick={() => {
-                  replayer.pause();
-                }}
-              >
-                Pause
-              </button>
-              <button
-                className={styles.Button}
-                onClick={() => {
-                  if (replayer.isPaused) {
-                    replayer.unpause().play();
-                  }
-                }}
-              >
-                Resume
-              </button>
-              <button
-                className={styles.Button}
-                onClick={() => {
-                  setResult({ label: '', list: [] });
-                  replayer.reset();
-                }}
-              >
-                Reset
-              </button>
-              <input
-                className={styles.Timeout}
-                defaultValue={replayer.timeout}
-                onChange={(event) => {
-                  replayer.timeout = parseInt(event.target.value);
-                }}
-                step={100}
-                type="number"
-              />
-            </div>
-          </>
-        ) : null}
-      </div>
     </CanvasContext.Provider>
   );
 };

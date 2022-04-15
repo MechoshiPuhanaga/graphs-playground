@@ -1,0 +1,65 @@
+.Container {
+  padding: var(--offset-medium);
+  font-size: var(--font-medium);
+  border-top-right-radius: var(--border-radius);
+}
+
+.Label {
+  margin: 0;
+}
+
+.ResultList {
+  display: flex;
+  margin: var(--offset-medium) 0;
+  padding: 0;
+
+  .ResultItem {
+    font-weight: bold;
+
+    &:not(:first-child) {
+      &::before {
+        content: "---";
+      }
+    }
+
+    &.Visited {
+      color: var(--color-ok);
+    }
+  }
+}
+
+.Controls {
+  display: flex;
+  align-items: center;
+}
+
+.Button,
+.ClearButton {
+  width: 12rem;
+  padding: var(--offset-small);
+  background-color: #ff7f7f;
+  border-radius: var(--border-radius);
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
+  transition: ease-in-out var(--transition);
+  cursor: pointer;
+
+  &:not(:last-child) {
+    margin-right: var(--offset-small);
+  }
+
+  &:hover {
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.75);
+  }
+}
+
+.ClearButton {
+  width: 8rem;
+}
+
+.Timeout {
+  width: 10rem;
+  padding: var(--offset-small);
+  font-size: var(--font-medium);
+  border: none;
+  border-radius: var(--border-radius);
+}

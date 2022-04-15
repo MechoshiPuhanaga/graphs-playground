@@ -2,41 +2,17 @@
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 
-.Result {
-  padding: var(--offset-medium);
-  font-size: var(--font-medium);
-}
-
-.ResultList {
-  display: flex;
-
-  .ResultItem {
-    font-weight: bold;
-
-    &:not(:first-child) {
-      &::before {
-        content: "---";
-      }
-    }
-
-    &.Visited {
-      color: var(--color-ok);
-    }
-  }
-}
-
-.Controls {
-  display: flex;
-  align-items: center;
-}
-
-.Button,
 .ClearButton {
-  width: 12rem;
-  padding: var(--offset-small);
-  background-color: var(--color-button);
+  position: absolute;
+  top: var(--offset-small);
+  right: var(--offset-small);
+  width: 8rem;
+  padding: var(--offset-tiny);
+  color: var(--color-background-focus);
+  background-color: #246797;
   border-radius: var(--border-radius);
   box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
   transition: ease-in-out var(--transition);
@@ -51,12 +27,17 @@
   }
 }
 
-.ClearButton {
-  width: 8rem;
-}
+.ControlPanel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: #504460;
+  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.75);
+  transform: translateY(0);
+  transition: all var(--transition) ease-in-out;
 
-.Timeout {
-  width: 10rem;
-  padding: var(--offset-small);
-  font-size: var(--font-medium);
+  &.Hidden {
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
+    transform: translateY(100%);
+  }
 }
