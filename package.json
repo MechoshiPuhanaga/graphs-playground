@@ -41,6 +41,7 @@
     "@cypress/code-coverage": "3.9.12",
     "@cypress/react": "5.12.4",
     "@cypress/webpack-dev-server": "1.8.4",
+    "@mechoshi/data-structures": "0.2.0",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.5",
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "13.0.1",
