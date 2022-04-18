@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import {
   createContext,
+  Dispatch,
   FC,
   MouseEvent,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -19,18 +21,27 @@ import styles from './Canvas.scss';
 export interface TraversalResult {
   label: string;
   list: VisitedItem[];
+  meta?: { visited: Vertex[] };
 }
 
 export interface ReplayState {
+  evaluatedVertexes: Record<string, Vertex>;
   visitedEdges: Record<string, boolean>;
   visitedVertexes: Record<string, Vertex>;
+}
+
+export interface Path {
+  from: string;
+  to: string;
 }
 
 interface ICanvasContext {
   from: Vertex | null;
   graph: Graph;
   height: number;
+  path: Path;
   setFrom: Function;
+  setPath: Dispatch<SetStateAction<Path>>;
   setResult: ({ label, list }: TraversalResult) => void;
   width: number;
 }
@@ -39,7 +50,9 @@ const initialCanvasContext: ICanvasContext = {
   from: null,
   graph: new Graph(() => {}),
   height: 0,
+  path: { from: '', to: '' },
   setFrom: () => {},
+  setPath: () => {},
   setResult: () => {},
   width: 0
 };
@@ -60,14 +73,26 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
 
   const [from, setFrom] = useState<Vertex | null>(null);
 
+  const [path, setPath] = useState<Path>({ from: '', to: '' });
+
   const [result, setResult] = useState<TraversalResult>({
     label: '',
     list: []
   });
 
-  const [context, setContext] = useState({ from, graph, height: 0, setFrom, setResult, width: 0 });
+  const [context, setContext] = useState({
+    from,
+    graph,
+    height: 0,
+    path,
+    setFrom,
+    setPath,
+    setResult,
+    width: 0
+  });
 
   const [replayState, setReplayState] = useState<ReplayState>({
+    evaluatedVertexes: {},
     visitedEdges: {},
     visitedVertexes: {}
   });
@@ -95,10 +120,11 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
     setContext((currentContext) => {
       return {
         ...currentContext,
-        from
+        from,
+        path
       };
     });
-  }, [from]);
+  }, [from, path]);
 
   useEffect(() => {
     const resizeHandler = () => {
@@ -131,13 +157,21 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
   useEffect(() => {
     replayer.reset();
 
-    setReplayState(() => ({ visitedEdges: {}, visitedVertexes: {} }));
+    setReplayState(() => ({ evaluatedVertexes: {}, visitedEdges: {}, visitedVertexes: {} }));
+
+    const evaluatedVertexes =
+      result.meta?.visited.reduce((obj, vertex) => {
+        obj[vertex.id] = vertex;
+
+        return obj;
+      }, {} as Record<string, Vertex>) ?? {};
 
     result.list.forEach((visitedItem, i, list) => {
       replayer.add(() => {
         setReplayState((currentReplayState) => {
           return {
             ...currentReplayState,
+            evaluatedVertexes,
             visitedEdges: {
               ...currentReplayState.visitedEdges,
               [`${list[i].from}-${list[i].vertex.id}`]: true
@@ -184,6 +218,7 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
         {Object.entries(graph.adjacencyList).map(([vertexId, vertex]) => {
           return (
             <VertexElement
+              isEvaluated={!!replayState.evaluatedVertexes[vertexId]}
               isFrom={from?.id === vertexId || result.list[0]?.vertex?.id === vertexId}
               isVisited={!!replayState.visitedVertexes[vertexId]}
               key={vertexId}

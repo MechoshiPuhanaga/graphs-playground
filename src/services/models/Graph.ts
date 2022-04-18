@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { BinaryHeap } from '@mechoshi/data-structures';
+
 import { calculateEdgeWeight } from '@services';
 
 export interface Coordinates {
@@ -16,6 +18,10 @@ export interface Vertex {
   id: string;
   label: string;
   neighbors: Neighbor[];
+}
+
+export interface VertexPath extends Vertex {
+  distance: number;
 }
 
 export interface Edge {
@@ -251,5 +257,74 @@ export class Graph {
 
   toString() {
     return JSON.stringify(this.adjacencyList);
+  }
+
+  Dijkstra(startId: string, endId: string, heuristics?: boolean) {
+    const distances = Object.keys(this.adjacencyList).reduce((obj, vertexId) => {
+      obj[vertexId] = vertexId === startId ? 0 : Infinity;
+
+      return obj;
+    }, {} as Record<string, number>);
+
+    const previous = Object.keys(this.adjacencyList).reduce((obj, vertexId) => {
+      obj[vertexId] = null;
+
+      return obj;
+    }, {} as Record<string, string | null>);
+
+    const priorityQueue = new BinaryHeap<VertexPath>(
+      (a: VertexPath, b: VertexPath) => a.distance < b.distance
+    );
+
+    Object.entries(this.adjacencyList).forEach(([vertexId, vertex]) => {
+      if (vertexId === startId) {
+        priorityQueue.insert({ ...vertex, distance: 0 });
+      } else {
+        priorityQueue.insert({ ...vertex, distance: Infinity });
+      }
+    });
+
+    let shortestVertexPath = priorityQueue.root();
+
+    const path: Vertex[] = [];
+    const visited: Vertex[] = [];
+
+    while (priorityQueue.size) {
+      shortestVertexPath = priorityQueue.extract();
+
+      if (shortestVertexPath?.id === endId) {
+        let currentStep: string | null = endId;
+
+        while (currentStep) {
+          path.push(this.adjacencyList[currentStep]);
+          currentStep = previous[currentStep];
+        }
+        break;
+      }
+
+      if (shortestVertexPath) {
+        for (const neighbor of shortestVertexPath.neighbors) {
+          const absoluteDistanceToEnd = calculateEdgeWeight(
+            this.adjacencyList[endId],
+            this.adjacencyList[neighbor.id]
+          );
+          const newDistance =
+            distances[shortestVertexPath.id] +
+            neighbor.weight +
+            (heuristics ? absoluteDistanceToEnd : 0);
+
+          if (newDistance < distances[neighbor.id]) {
+            visited.push(this.adjacencyList[neighbor.id]);
+            distances[neighbor.id] = newDistance;
+            previous[neighbor.id] = shortestVertexPath.id;
+            priorityQueue.insert({ ...this.adjacencyList[neighbor.id], distance: newDistance });
+          }
+        }
+      }
+    }
+
+    path.reverse();
+
+    return { path, visited };
   }
 }

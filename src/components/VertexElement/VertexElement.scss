@@ -11,6 +11,7 @@
   cursor: pointer;
 
   &:hover,
+  &.IsEvaluated,
   &.IsFrom,
   &.Visited {
     width: var(--offset-large);
@@ -22,6 +23,18 @@
       width: var(--offset-large);
       height: var(--offset-large);
     }
+  }
+
+  &.IsEvaluated {
+    background-color: #ff8b28;
+
+    .Label {
+      color: #ff8b28;
+    }
+  }
+
+  &.Visited {
+    background-color: var(--color-ok);
   }
 
   &.IsFrom {

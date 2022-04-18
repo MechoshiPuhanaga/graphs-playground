@@ -12,7 +12,7 @@
   width: 8rem;
   padding: var(--offset-tiny);
   color: var(--color-background-focus);
-  background-color: #246797;
+  background-color: #2c8bc3;
   border-radius: var(--border-radius);
   box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
   transition: ease-in-out var(--transition);
@@ -31,8 +31,6 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  background-color: #504460;
-  box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.75);
   transform: translateY(0);
   transition: all var(--transition) ease-in-out;
 
