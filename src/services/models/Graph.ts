@@ -6,11 +6,16 @@ export interface Coordinates {
   y: number;
 }
 
+export interface Neighbor {
+  id: string;
+  weight: number;
+}
+
 export interface Vertex {
   coordinates: Coordinates;
   id: string;
   label: string;
-  neighbors: string[];
+  neighbors: Neighbor[];
 }
 
 export interface Edge {
@@ -72,9 +77,9 @@ export class Graph {
 
     this.edges = this.edges.filter((edge) => edge.from !== id && edge.to !== id);
 
-    neighbors.forEach((neighborId) => {
+    neighbors.forEach(({ id: neighborId }) => {
       this.adjacencyList[neighborId].neighbors = this.adjacencyList[neighborId].neighbors.filter(
-        (vertexId) => vertexId !== id
+        ({ id: vertexId }) => vertexId !== id
       );
     });
 
@@ -89,9 +94,39 @@ export class Graph {
       // connected to this vertex:
       this.edges = this.edges.map((edge) => {
         if (edge.from === id || edge.to === id) {
+          const weight = calculateEdgeWeight(
+            this.adjacencyList[edge.from],
+            this.adjacencyList[edge.to]
+          );
+
+          // Update the weights in the vertexes:
+          let neighborId = '';
+
+          if (edge.from === id) {
+            neighborId = edge.to;
+          } else {
+            neighborId = edge.from;
+          }
+
+          const neighbor = this.adjacencyList[neighborId];
+
+          const neighborToUpdate = neighbor.neighbors.find(({ id: vertexId }) => vertexId === id);
+
+          if (neighborToUpdate) {
+            neighborToUpdate.weight = weight;
+          }
+
+          const neighborToUpdate2 = this.adjacencyList[id].neighbors.find(
+            ({ id: vertexId }) => vertexId === neighborId
+          );
+
+          if (neighborToUpdate2) {
+            neighborToUpdate2.weight = weight;
+          }
+
           return {
             ...edge,
-            weight: calculateEdgeWeight(this.adjacencyList[edge.from], this.adjacencyList[edge.to])
+            weight
           };
         }
 
@@ -108,13 +143,15 @@ export class Graph {
     } else {
       let flag = 0;
 
-      if (!this.adjacencyList[fromId].neighbors.includes(toId)) {
-        this.adjacencyList[fromId].neighbors.push(toId);
+      const weight = calculateEdgeWeight(this.adjacencyList[fromId], this.adjacencyList[toId]);
+
+      if (!this.adjacencyList[fromId].neighbors.find(({ id }) => id === toId)) {
+        this.adjacencyList[fromId].neighbors.push({ id: toId, weight });
         flag++;
       }
 
-      if (!this.adjacencyList[toId].neighbors.includes(fromId)) {
-        this.adjacencyList[toId].neighbors.push(fromId);
+      if (!this.adjacencyList[toId].neighbors.find(({ id }) => id === fromId)) {
+        this.adjacencyList[toId].neighbors.push({ id: fromId, weight });
         flag++;
       }
 
@@ -137,11 +174,11 @@ export class Graph {
       this.edges = this.edges.filter((edge) => !(edge.from === from && edge.to === to));
 
       this.adjacencyList[from].neighbors = this.adjacencyList[from].neighbors.filter(
-        (vertexId) => vertexId !== to
+        ({ id: vertexId }) => vertexId !== to
       );
 
       this.adjacencyList[to].neighbors = this.adjacencyList[to].neighbors.filter(
-        (vertexId) => vertexId !== from
+        ({ id: vertexId }) => vertexId !== from
       );
 
       this.version++;
@@ -168,7 +205,7 @@ export class Graph {
 
       result.push(visitedItem);
 
-      visitedItem.vertex.neighbors.forEach((neighborId) =>
+      visitedItem.vertex.neighbors.forEach(({ id: neighborId }) =>
         df({ from: visitedItem.vertex.id, vertex: this.adjacencyList[neighborId] })
       );
     };
@@ -200,7 +237,7 @@ export class Graph {
 
         if (visitedItem.vertex.neighbors.length) {
           queue.push(
-            ...visitedItem.vertex.neighbors.map((vertexId) => ({
+            ...visitedItem.vertex.neighbors.map(({ id: vertexId }) => ({
               from: visitedItem.vertex.id,
               vertex: this.adjacencyList[vertexId]
             }))
