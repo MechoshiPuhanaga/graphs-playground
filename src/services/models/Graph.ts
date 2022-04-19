@@ -40,6 +40,24 @@ export interface VisitedItem {
 export class Graph {
   static LABEL_ID = 65;
 
+  static fromJSON({ data, onVersionUpdate }: { data: string; onVersionUpdate: Function }) {
+    const parsed: { adjacencyList: AdjacencyList; edges: Edge[] } = JSON.parse(data);
+
+    const graph = new Graph(onVersionUpdate);
+    graph.adjacencyList = parsed.adjacencyList;
+    graph.edges = parsed.edges;
+
+    const labels = Object.values(graph.adjacencyList).map((vertex) => vertex.label);
+
+    Graph.LABEL_ID = 65;
+
+    while (labels.includes(String.fromCharCode(Graph.LABEL_ID))) {
+      Graph.LABEL_ID++;
+    }
+
+    return graph;
+  }
+
   adjacencyList: AdjacencyList = {};
 
   edges: Edge[] = [];
@@ -256,7 +274,7 @@ export class Graph {
   }
 
   toString() {
-    return JSON.stringify(this.adjacencyList);
+    return JSON.stringify({ adjacencyList: this.adjacencyList, edges: this.edges });
   }
 
   Dijkstra(startId: string, endId: string, heuristics?: boolean) {

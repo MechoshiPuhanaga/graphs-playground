@@ -1,0 +1,65 @@
+.Container {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: var(--offset-medium);
+  background-color: var(--color-button);
+  border-radius: var(--border-radius);
+}
+
+.GraphName {
+  width: 20rem;
+  margin-right: var(--offset-medium);
+  padding: var(--offset-tiny);
+  font-size: var(--font-medium);
+  text-align: right;
+  border: none;
+  border-radius: var(--border-radius);
+}
+
+.CloseButton,
+.DeleteButton,
+.LoadButton,
+.SaveButton {
+  padding: var(--offset-tiny) var(--offset-small);
+  color: var(--color-background-focus);
+  background-color: var(--color-ok);
+  border-radius: var(--border-radius);
+  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.75);
+  transition: ease-in-out var(--transition);
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.75);
+  }
+}
+
+.CloseButton {
+  align-self: flex-end;
+  width: auto;
+  margin-bottom: var(--offset-medium);
+}
+
+.DeleteButton {
+  background-color: var(--color-error);
+}
+
+.DeleteButton,
+.LoadButton {
+  margin-left: var(--offset-medium);
+}
+
+.SaveButton {
+  width: 12rem;
+}
+
+.ListLabel {
+  margin: var(--offset-medium) 0;
+}
+
+.ListItem {
+  margin-left: var(--offset-medium);
+  margin-bottom: var(--offset-small);
+  list-style: circle;
+  font-size: var(--font-small);
+}

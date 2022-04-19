@@ -48,7 +48,7 @@ const EdgeElement: FC<EdgeProps> = memo(({ className, edge, isVisited }) => {
       height: length,
       transform: `rotate(${sign * angle + correction}deg) translateX(-2px)`
     };
-  }, [edge, graph.adjacencyList, height, width]);
+  }, [edge, graph, height, width]);
 
   const onDoubleClickHandler = useCallback(
     (event: MouseEvent) => {

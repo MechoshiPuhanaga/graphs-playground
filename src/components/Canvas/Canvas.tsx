@@ -13,7 +13,7 @@ import {
   useState
 } from 'react';
 
-import { ControlPanel, EdgeElement, VertexElement } from '@components';
+import { ControlPanel, EdgeElement, Menu, VertexElement } from '@components';
 import { Graph, Replayer, REPLAY_TIMEOUT, useClass, Vertex, VisitedItem } from '@services';
 
 import styles from './Canvas.scss';
@@ -36,10 +36,12 @@ export interface Path {
 }
 
 interface ICanvasContext {
+  closeMenu: () => void;
   from: Vertex | null;
   graph: Graph;
   height: number;
   path: Path;
+  setGraph: (data: string) => void;
   setFrom: Function;
   setPath: Dispatch<SetStateAction<Path>>;
   setResult: ({ label, list }: TraversalResult) => void;
@@ -47,10 +49,12 @@ interface ICanvasContext {
 }
 
 const initialCanvasContext: ICanvasContext = {
+  closeMenu: () => {},
   from: null,
   graph: new Graph(() => {}),
   height: 0,
   path: { from: '', to: '' },
+  setGraph: () => {},
   setFrom: () => {},
   setPath: () => {},
   setResult: () => {},
@@ -66,10 +70,15 @@ const useCanvas = () => {
 interface CanvasProps {
   className?: string;
   graph: Graph;
+  setVersion: Dispatch<SetStateAction<number>>;
 }
 
-const Canvas: FC<CanvasProps> = ({ className, graph }) => {
+const Canvas: FC<CanvasProps> = ({ className, graph: initialGraph, setVersion }) => {
   const element = useRef<HTMLDivElement | null>(null);
+
+  const [graph, setGraph] = useState(initialGraph);
+
+  const [openMenu, setOpenMenu] = useState(false);
 
   const [from, setFrom] = useState<Vertex | null>(null);
 
@@ -80,11 +89,15 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
     list: []
   });
 
+  const closeMenu = useCallback(() => setOpenMenu(false), []);
+
   const [context, setContext] = useState({
+    closeMenu,
     from,
     graph,
     height: 0,
     path,
+    setGraph: (data: string) => setGraph(Graph.fromJSON({ data, onVersionUpdate: setVersion })),
     setFrom,
     setPath,
     setResult,
@@ -120,11 +133,12 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
     setContext((currentContext) => {
       return {
         ...currentContext,
+        graph,
         from,
         path
       };
     });
-  }, [from, path]);
+  }, [from, graph, path]);
 
   useEffect(() => {
     const resizeHandler = () => {
@@ -215,7 +229,15 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
         >
           clear
         </button>
-        {Object.entries(graph.adjacencyList).map(([vertexId, vertex]) => {
+        <button
+          className={styles.Save}
+          onClick={() => {
+            setOpenMenu(true);
+          }}
+        >
+          menu
+        </button>
+        {Object.entries(context.graph.adjacencyList).map(([vertexId, vertex]) => {
           return (
             <VertexElement
               isEvaluated={!!replayState.evaluatedVertexes[vertexId]}
@@ -226,7 +248,7 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
             />
           );
         })}
-        {graph.edges.map((edge) => {
+        {context.graph.edges.map((edge) => {
           return (
             <EdgeElement
               edge={edge}
@@ -240,7 +262,7 @@ const Canvas: FC<CanvasProps> = ({ className, graph }) => {
             />
           );
         })}
-
+        {openMenu ? <Menu className={styles.Menu} /> : null}
         <ControlPanel
           className={useClass(
             [styles.ControlPanel, !result.list.length && styles.Hidden],

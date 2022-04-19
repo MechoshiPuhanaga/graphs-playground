@@ -16,7 +16,7 @@ const App: FC = () => {
 
   return (
     <main className={styles.Container}>
-      <Canvas className={styles.Canvas} graph={graph} />
+      <Canvas className={styles.Canvas} graph={graph} setVersion={setVersion} />
     </main>
   );
 };
