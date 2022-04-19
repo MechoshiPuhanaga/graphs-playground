@@ -108,7 +108,7 @@ const ContextMenu: FC<ContextMenuProps> = memo(
                   result.path.find((pathVertex) => pathVertex.id === vertex.id)?.label ?? '';
 
                 setResult({
-                  label: `Dijkstra from ${labelFrom} to ${labelTo}`,
+                  label: `Dijkstra from ${labelFrom} to ${labelTo} with heuristics`,
                   list: result.path.map((currentVertex, index, list) => {
                     return {
                       from: list[index - 1]?.id ?? '',

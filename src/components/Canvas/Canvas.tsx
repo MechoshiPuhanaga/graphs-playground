@@ -230,7 +230,7 @@ const Canvas: FC<CanvasProps> = ({ className, graph: initialGraph, setVersion })
           clear
         </button>
         <button
-          className={styles.Save}
+          className={styles.MenuButton}
           onClick={() => {
             setOpenMenu(true);
           }}

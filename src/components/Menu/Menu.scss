@@ -46,7 +46,7 @@
 
 .DeleteButton,
 .LoadButton {
-  margin-left: var(--offset-medium);
+  margin-left: var(--offset-small);
 }
 
 .SaveButton {
@@ -55,11 +55,15 @@
 
 .ListLabel {
   margin: var(--offset-medium) 0;
+  padding-bottom: var(--offset-small);
+  border-bottom: 1px solid var(--color-background-focus);
 }
 
 .ListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-left: var(--offset-medium);
   margin-bottom: var(--offset-small);
-  list-style: circle;
   font-size: var(--font-small);
 }

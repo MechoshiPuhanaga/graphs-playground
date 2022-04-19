@@ -76,43 +76,45 @@ const Menu: FC<MenuProps> = memo(({ className }) => {
                 return (
                   <li className={styles.ListItem} key={name}>
                     {name}
-                    <button
-                      className={styles.LoadButton}
-                      onClick={() => {
-                        const graphs =
-                          (JSON.parse(localStorage.getItem('graphs') ?? '') as Record<
-                            string,
-                            string
-                          >) || {};
+                    <div>
+                      <button
+                        className={styles.LoadButton}
+                        onClick={() => {
+                          const graphs =
+                            (JSON.parse(localStorage.getItem('graphs') ?? '') as Record<
+                              string,
+                              string
+                            >) || {};
 
-                        const graphToLoad = graphs[name];
+                          const graphToLoad = graphs[name];
 
-                        if (graphToLoad) {
-                          setGraph(graphToLoad);
-                        }
+                          if (graphToLoad) {
+                            setGraph(graphToLoad);
+                          }
 
-                        closeMenu();
-                      }}
-                    >
-                      load
-                    </button>
-                    <button
-                      className={styles.DeleteButton}
-                      onClick={() => {
-                        const graphs =
-                          (JSON.parse(localStorage.getItem('graphs') ?? '') as Record<
-                            string,
-                            string
-                          >) || {};
+                          closeMenu();
+                        }}
+                      >
+                        load
+                      </button>
+                      <button
+                        className={styles.DeleteButton}
+                        onClick={() => {
+                          const graphs =
+                            (JSON.parse(localStorage.getItem('graphs') ?? '') as Record<
+                              string,
+                              string
+                            >) || {};
 
-                        delete graphs[name];
+                          delete graphs[name];
 
-                        localStorage.setItem(`graphs`, JSON.stringify(graphs));
-                        closeMenu();
-                      }}
-                    >
-                      delete
-                    </button>
+                          localStorage.setItem(`graphs`, JSON.stringify(graphs));
+                          closeMenu();
+                        }}
+                      >
+                        delete
+                      </button>
+                    </div>
                   </li>
                 );
               })}
